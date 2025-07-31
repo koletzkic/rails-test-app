@@ -7,11 +7,20 @@
 ### This project uses docker-compose to orchestrate a complete Ruby on Rails stack with some POC monitoring and alerting steps as well
 
 - Build - to build and run the stack simply run `docker-compose up --build -d` from within the `/build` dir 
-- web – Rails Application all within `/hello-world` dir (see screenshot)
+- web – Rails Application all within `/hello-world` dir <img width="467" height="291" alt="image" src="https://github.com/user-attachments/assets/daf00fb3-9cb6-4d10-ba5f-6b6b20db6267" />
 - db – PostgreSQL
 - redis
 - metrics exporters - redis/postgres/prom. Just to note the rails bit here was one portion I was not 100% sure on because it seemed quite rails specific and online I read lots of conflicting reports on exporting prom metrics either running within rails it's self via middleware vs a dedicated exporter container. I went for the latter because it is more inline with what I am familiar with and generally in production you would eventually have a dedicated external APM style setup. 
 - graafana - for visual dashboards
+
+# Screenshots
+
+<img width="1511" height="732" alt="image" src="https://github.com/user-attachments/assets/151c37de-08b5-4ef3-8871-6e7ed13c21c4" />
+<img width="1510" height="855" alt="image" src="https://github.com/user-attachments/assets/c64a14b1-d4b3-470e-b573-9a3dfdc0d56c" />
+<img width="769" height="539" alt="image" src="https://github.com/user-attachments/assets/422e6f8f-f26f-4a8e-adc6-55c90b5fc91d" />
+<img width="1214" height="864" alt="image" src="https://github.com/user-attachments/assets/836253f0-c2b4-4f46-8b84-919a82c9a255" />
+
+
 
 ## Key Metrics to Monitor in Production 
 
