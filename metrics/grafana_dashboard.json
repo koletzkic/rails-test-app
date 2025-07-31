@@ -1,0 +1,49 @@
+{
+  "id": null,
+  "title": "Rails App Monitoring",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Rails: Requests (custom_total_requests)",
+      "targets": [
+        {
+          "expr": "custom_total_requests",
+          "interval": "",
+          "legendFormat": "total",
+          "refId": "A"
+        }
+      ],
+      "datasource": "Prometheus",
+      "id": 1
+    },
+    {
+      "type": "graph",
+      "title": "PostgreSQL: Connections",
+      "targets": [
+        {
+          "expr": "pg_stat_database_numbackends",
+          "legendFormat": "{{datname}}",
+          "refId": "B"
+        }
+      ],
+      "datasource": "Prometheus",
+      "id": 2
+    },
+    {
+      "type": "graph",
+      "title": "Redis: Connected Clients",
+      "targets": [
+        {
+          "expr": "redis_connected_clients",
+          "refId": "C"
+        }
+      ],
+      "datasource": "Prometheus",
+      "id": 3
+    }
+  ],
+  "schemaVersion": 26,
+  "version": 1,
+  "refresh": "10s"
+}

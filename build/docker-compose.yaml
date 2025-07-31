@@ -1,0 +1,100 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: ../hello_world
+      dockerfile: Dockerfile 
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+      - prometheus_exporter
+    environment:
+      - DATABASE_URL=postgres://user:pass@db:5432/rails_app
+      - REDIS_URL=redis://redis:6379/0
+      - RAILS_ENV=development
+    command: ["bin/rails", "server", "-b", "0.0.0.0"]
+    volumes:
+      - ../hello_world:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: rails_app
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  redis_exporter:
+    image: oliver006/redis_exporter:v1.61.0
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    ports:
+      - "9187:9187"
+    environment:
+      - DATA_SOURCE_NAME=postgresql://user:pass@db:5432/rails_app?sslmode=disable
+    depends_on:
+      - db
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ../metrics/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ../metrics/alerts.yaml:/etc/prometheus/alerts.yaml
+    ports:
+      - "9090:9090"
+
+  prometheus_exporter:
+    image: ruby:3.2.9
+    working_dir: /app
+    volumes:
+      - ../hello_world:/app
+    command: bash -c "gem install prometheus_exporter && prometheus_exporter --bind 0.0.0.0"
+    ports:
+      - "9394:9394"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../metrics/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      - ../metrics/grafana_dashboard.json:/etc/grafana/provisioning/dashboards/grafana_dashboard.json
+      - ../metrics/datasources.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres_data:
+  grafana_data:
